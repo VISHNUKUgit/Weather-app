@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="weather-container">
+        <div class="left">
+            <h1>Weather App</h1>
+                <div id="left-content">
+                    <h2 class="h2-head">Thrissur, INDIA </h2>
+                    <p>Temperature: 20°C</p>
+                    <p>Feels Like: 22°C</p>
+                    <p>Date and Time: September 8, 2023 12:30 PM</p>
+                </div>
+        </div>
+    <div class="right">
+        <div>
+            <input type="text" id="cityInput" placeholder="Enter city">
+            <button id="searchButton" onclick="getDetails()">Search</button>
+        </div>
+        <div id="right-content">
+            <h5>Country: INDIA</h5>
+            <h5>Humidity: 50%</h5>
+            <h5>Wind: 10 km/h</h5>
+            <h5>Pressure: 1013 hPa</h5>
+        </div>
+    </div>
+    <div id="datetime"></div>
+    </div>
+
+    
+</body>
+<script>
+    //   API fetching
+    const leftContent = document.getElementById("left-content");
+    const rightContent = document.getElementById("right-content");
+
+    const getDetails = async () => {
+        const place = document.getElementById("cityInput").value;
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${place}&appid=8ac5c4d57ba6a4b3dfcf622700447b1e&units=metric`);
+        
+if(response.status ===200){
+    const allDetails = await response.json();
+        leftContent.innerHTML = `
+            <h2 class="h2-head">${allDetails.name}, ${allDetails.sys.country} <img src="https://openweathermap.org/img/wn/${allDetails.weather[0].icon}@2x.png" alt=""> </h2>
+            <h3>${allDetails.weather[0].main}</h3>
+            <h3>Temperature: ${allDetails.main.temp}°C</h3>
+            <p>Feels Like: ${allDetails.main.feels_like}°C</p>
+            <p>Date and Time: ${new Date(allDetails.dt * 1000).toLocaleString()} Indian Standard Time (IST)</p>
+        `;
+
+        rightContent.innerHTML = `
+            <h5>Country: ${allDetails.sys.country}</h5>
+            <h5>Humidity: ${allDetails.main.humidity}%</h5>
+            <h5>Wind: ${allDetails.wind.speed} km/h</h5>
+            <h5>Pressure: ${allDetails.main.pressure} hPa</h5>
+        `;}
+        else{
+            console.log("enterd");
+            const errorMessage = await response.json();
+            console.log(errorMessage.message)
+            alert(`Error: ${errorMessage.message}`);
+        }
+    };
+    // date and time
+    function updateDateTime() {
+        const datetimeElement = document.getElementById("datetime");
+        const now = new Date();
+        const formattedDateTime = now.toLocaleString(); 
+        datetimeElement.textContent = formattedDateTime;
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+</script>
+</html>
